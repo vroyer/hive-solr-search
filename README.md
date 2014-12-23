@@ -14,7 +14,8 @@ To install:
 	$ git clone http://github.org/vroyer/hive-solr-search
 	$ cd hive-solr-search
 	$ mvn package
-	$ cp target/hive-solr-search-0.1-SNAPSHOT-jar-with-dependencies.jar `$HIVE_HOME/lib`
+	$ cp target/hive-solr-search-0.1-SNAPSHOT.jar `$HIVE_HOME/lib`
+	$ cp target/hive-solr-search-0.1-SNAPSHOT.jar `$HADOOP_HOME/lib`
 
 Basic Usage
 ===========
