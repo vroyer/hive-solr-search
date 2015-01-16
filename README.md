@@ -3,7 +3,7 @@ Introduction
 
 Apache SOLR is a power full search engine. With this Hive SOLR Search Storage Handler, you can combine SOLR search with Hive QL to achieve powerfull analytics. 
 
-If you are you using Datastax Entreprise, Cassandra tables can be indexed by SOLR (see http://www.datastax.com/documentation/datastax_enterprise/4.5/datastax_enterprise/srch/srchIntro.html) and a SOLR search should be much more faster than a MapReduce job.  
+If you are you using Datastax Entreprise, Cassandra tables can be indexed by SOLR (see http://www.datastax.com/documentation/datastax_enterprise/4.5/datastax_enterprise/srch/srchIntro.html) and a SOLR search should be much faster than a MapReduce job.  
 
 
 Installation
@@ -111,7 +111,7 @@ The solr.split.size property (default is 100 000) limits the number of results u
 Pushdown filtering
 ==================
 
-If you set hive.optimize.ppd=true, the SolrStorageHandler parse the WHERE clause to build a SOLR filter query expression (fq parameter). For example, the following query generates a SOLR request with fq=title:"List of solar".
+If you set hive.optimize.ppd=true, the SolrStorageHandler parses the WHERE clause to build a SOLR filter query expression (fq parameter). For example, the following query generates a SOLR request with fq=title:"List of solar".
 
 	CREATE EXTERNAL TABLE hive_solr_wiki_fq ( id INT, date TIMESTAMP, title  STRING) 
 	STORED BY "org.vroyer.hive.solr.SolrStorageHandler" WITH SERDEPROPERTIES ( "solr.document.mapping" = "id,date,title")
@@ -160,7 +160,7 @@ You can also use a solr_query parameter to dynamically set the SOLR q parameter,
 	23760492	2011-07-21 09:48:02.998	List of French born footballers who have played for other national teams	NULL
 	Time taken: 0.09 seconds, Fetched: 7 row(s)
 
-Because Hive currently evaluates twice the pushed predicates when residual predicate is null, previous example have been tested with the patch https://issues.apache.org/jira/browse/HIVE-9186. Without this patch, the workaround is to add a fake (1=1) predicate to the where clause, but this may add a performance penalty if you don't have any filter task following the request to the SolrStorageHandler. You can check the execution...
+Because Hive currently evaluates the pushed predicates twice when residual predicate is null, previous examples have been tested with the patch https://issues.apache.org/jira/browse/HIVE-9186. Without this patch, the workaround is to add a fake (1=1) predicate to the where clause, but this may add a performance penalty if you don't have any filter task following the request to the SolrStorageHandler. You can check the execution...
  
 	hive> EXPLAIN SELECT * FROM hive_solr_wiki_q WHERE solr_query='title:natio*';
 	OK
@@ -199,4 +199,4 @@ Because Hive currently evaluates twice the pushed predicates when residual predi
 Acknowledgements
 ================
 
-Thanks' you to Francois Dang for his work on hive-solr (https://github.com/chimpler/hive-solr) that served as a base for this SolrStorageHandler.
+Thanks to Francois Dang for his work on hive-solr (https://github.com/chimpler/hive-solr) that served as a base for this SolrStorageHandler.
