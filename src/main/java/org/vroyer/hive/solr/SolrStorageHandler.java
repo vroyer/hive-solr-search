@@ -51,15 +51,14 @@ import org.apache.hadoop.hive.ql.security.authorization.HiveAuthorizationProvide
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPAnd;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPEqual;
 import org.apache.hadoop.hive.ql.udf.generic.GenericUDFOPOr;
-import org.apache.hadoop.hive.serde2.ColumnProjectionUtils;
 import org.apache.hadoop.hive.serde2.Deserializer;
 import org.apache.hadoop.hive.serde2.SerDe;
 import org.apache.hadoop.hive.serde2.typeinfo.TypeInfoFactory;
 import org.apache.hadoop.mapred.InputFormat;
 import org.apache.hadoop.mapred.JobConf;
 import org.apache.hadoop.mapred.OutputFormat;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 
 public class SolrStorageHandler implements HiveStorageHandler,HiveStoragePredicateHandler {
 	
@@ -120,8 +119,9 @@ public class SolrStorageHandler implements HiveStorageHandler,HiveStoragePredica
 			if (deleteData && isExternal) {
 				// nothing to do...
 			} else if(deleteData && !isExternal) {
-				String url = tbl.getParameters().get(ConfigurationUtil.SOLR_URL);
-	            HttpSolrServer server = new HttpSolrServer(url);
+				String zkUrl = tbl.getParameters().get(ConfigurationUtil.ZK_URL);
+				String collectionId = tbl.getParameters().get(ConfigurationUtil.COLLECTION_ID);
+	            SolrServer server = SolrServerFactory.getInstance().createCloudServer(zkUrl, collectionId);
 	            try {
 					server.deleteByQuery("*:*");
 					server.commit();

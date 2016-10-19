@@ -29,7 +29,6 @@ import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.hive.serde.Constants;
 import org.apache.hadoop.hive.serde.serdeConstants;
 import org.apache.hadoop.mapred.JobConf;
 
@@ -38,10 +37,15 @@ import com.google.common.collect.ImmutableSet;
 public class ConfigurationUtil {
 	
 	/*
-	 * SOLR server URL.
+	 * Zookeeper server URL.
 	 */
-	public static final String SOLR_URL = "solr.url";
-	
+	public static final String ZK_URL = "zk.url";
+
+	/*
+	 * SOLR collection identifier.
+	 */
+	public static final String COLLECTION_ID = "collection.id";
+
 	/*
 	 * SOLR query string.
 	 */
@@ -65,7 +69,9 @@ public class ConfigurationUtil {
 	
 		
 	
-	public static final Set<String> ALL_PROPERTIES = ImmutableSet.of(SOLR_URL,
+	public static final Set<String> ALL_PROPERTIES = ImmutableSet.of(
+			ZK_URL,
+			COLLECTION_ID,
 			SOLR_QS, 
 			SOLR_COLUMN_MAPPING, 
 			SOLR_FACET_MAPPING, 
@@ -81,10 +87,14 @@ public class ConfigurationUtil {
 		return conf.get(SOLR_FACET_MAPPING);
 	}
 
-	public final static String getUrl(Configuration conf) {
-		return conf.get(SOLR_URL);
+	public final static String getZkUrl(Configuration conf) {
+		return conf.get(ZK_URL);
 	}
-	
+
+	public final static String getCollectionId(Configuration conf) {
+		return conf.get(COLLECTION_ID);
+	}
+
 	public final static String getQs(Configuration conf) {
 		return conf.get(SOLR_QS);
 	}

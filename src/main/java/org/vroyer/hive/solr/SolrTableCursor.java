@@ -37,6 +37,7 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
@@ -48,7 +49,7 @@ import org.apache.solr.common.SolrDocumentList;
 public class SolrTableCursor {
 	SolrTable table ;
 	
-	private HttpSolrServer server;
+	private SolrServer server;
 	private int start;
 	private int count;
 	private int solrSplitSize;
@@ -64,7 +65,7 @@ public class SolrTableCursor {
 	
 	SolrTableCursor(SolrTable table, int start, int count, int solrSplitSize) throws IOException {
 		this.table = table;
-        server = new HttpSolrServer(table.url);
+        server = SolrServerFactory.getInstance().createCloudServer(table.zkUrl, table.collectionId);
         this.start = start;
         this.count = count;
         this.solrSplitSize = solrSplitSize;
@@ -107,7 +108,7 @@ public class SolrTableCursor {
 			for(String s: map.keySet()) {
 				sb.append(s).append('=').append(Arrays.toString(map.get(s))).append(' ');
 			}
-			log.info("SOLR request: "+table.url+" "+sb.toString());
+			log.info("SOLR request: "+sb.toString());
 		}
 		
         
