@@ -56,7 +56,7 @@ public class SolrTable {
 	public SolrTable(JobConf conf) {
 		String filterExprSerialized = conf.get(TableScanDesc.FILTER_EXPR_CONF_STR);
 		if (filterExprSerialized != null) {
-			ExprNodeDesc filterExpr = Utilities.deserializeExpression(filterExprSerialized, conf);
+			ExprNodeDesc filterExpr = Utilities.deserializeExpression(filterExprSerialized);
 			log.debug("filterExpr="+filterExpr.getExprString());
 			SolrStorageHandler.buildQuery(filterExpr,fq,q);
 		}

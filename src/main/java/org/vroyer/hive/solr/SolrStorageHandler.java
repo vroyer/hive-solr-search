@@ -234,7 +234,7 @@ public class SolrStorageHandler implements HiveStorageHandler,HiveStoragePredica
 				boolean pushRight=pushDownFilter(solrColumns, inputFunc.getChildren().get(1), dpRight);
 				if (pushLeft && pushRight && (dpLeft.residualPredicate == null) && (dpRight.residualPredicate == null)) {
 					// ful push down
-					dp.pushedPredicate = input;
+					dp.pushedPredicate = (ExprNodeGenericFuncDesc)input;
 					dp.residualPredicate = null;
 					return true;
 				} 
@@ -250,7 +250,7 @@ public class SolrStorageHandler implements HiveStorageHandler,HiveStoragePredica
 						dp.pushedPredicate = dpRight.pushedPredicate;
 					} else {
 						dp.pushedPredicate = null;
-						dp.residualPredicate = input;
+						dp.residualPredicate = (ExprNodeGenericFuncDesc)input;
 						return false;
 					}
 					if ((dpLeft.residualPredicate!=null)&&(dpRight.residualPredicate!=null)) {
@@ -270,14 +270,14 @@ public class SolrStorageHandler implements HiveStorageHandler,HiveStoragePredica
 			} else if (inputFunc.getGenericUDF() instanceof GenericUDFOPEqual)  {
 				if ((isSolrColumn(solrColumns, inputLeft) && isConstant(inputRight)) ||
 				    (isSolrColumn(solrColumns, inputRight) && isConstant(inputLeft))) {
-					dp.pushedPredicate = input;
+					dp.pushedPredicate = (ExprNodeGenericFuncDesc)input;
 					dp.residualPredicate = null;
 					return true;
 				}
 			}
+			dp.residualPredicate = (ExprNodeGenericFuncDesc) input;
 		}
 		dp.pushedPredicate = null;
-		dp.residualPredicate = input;
 		return false;
 	}
 	
