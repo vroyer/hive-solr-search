@@ -14,6 +14,13 @@
 			<url>https://repository.apache.org/content/groups/public/</url>
 		</repository>
   </repositories>
+
+  <distributionManagement>
+  	<snapshotRepository>
+    	<id>dmp-snapshots</id>
+    	<url>http://nexus.int.scdmp.net/content/repositories/dmp-snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
 	
   <url>http://maven.apache.org</url>
 
