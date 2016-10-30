@@ -18,7 +18,7 @@
   <distributionManagement>
   	<snapshotRepository>
     	<id>dmp-snapshots</id>
-    	<url>http://nexus.int.scdmp.net/content/repositories/dmp-snapshots</url>
+    	<url>http://nexus.int.scdmp.net/repository/dmp-snapshots</url>
     </snapshotRepository>
   </distributionManagement>
 	
