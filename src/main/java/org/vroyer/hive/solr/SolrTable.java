@@ -31,19 +31,19 @@ import org.apache.hadoop.hive.ql.exec.Utilities;
 import org.apache.hadoop.hive.ql.plan.ExprNodeDesc;
 import org.apache.hadoop.hive.ql.plan.TableScanDesc;
 import org.apache.hadoop.mapred.JobConf;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.common.SolrInputDocument;
 
 public class SolrTable {
-	private HttpSolrServer server;
+	private SolrServer server;
 	
 	protected int solrSplitSize;
 	protected String[] fields;
 	protected String facetType;
-	protected String url;
+	protected String zkUrl;
+	protected String collectionId;
 	protected String qs;
 	protected StringBuilder fq = new StringBuilder();
 	protected StringBuilder q = new StringBuilder();
@@ -56,20 +56,21 @@ public class SolrTable {
 	public SolrTable(JobConf conf) {
 		String filterExprSerialized = conf.get(TableScanDesc.FILTER_EXPR_CONF_STR);
 		if (filterExprSerialized != null) {
-			ExprNodeDesc filterExpr = Utilities.deserializeExpression(filterExprSerialized, conf);
+			ExprNodeDesc filterExpr = Utilities.deserializeExpression(filterExprSerialized);
 			log.debug("filterExpr="+filterExpr.getExprString());
 			SolrStorageHandler.buildQuery(filterExpr,fq,q);
 		}
 		
-        this.url = ConfigurationUtil.getUrl(conf);
+        this.zkUrl = ConfigurationUtil.getZkUrl(conf);
+		this.collectionId = ConfigurationUtil.getCollectionId(conf);
 		this.qs = ConfigurationUtil.getQs(conf);
 		this.fields = ConfigurationUtil.getAllColumns(conf.get(ConfigurationUtil.SOLR_COLUMN_MAPPING));
         this.facetType = conf.get(ConfigurationUtil.SOLR_FACET_MAPPING);
-        log.info("solr.url="+url+" solr.qs="+qs+" fq="+fq+" q="+q);
+        log.info("zk.url="+zkUrl+" solr.collection="+collectionId+" solr.qs="+qs+" fq="+fq+" q="+q);
         
         this.solrSplitSize = ConfigurationUtil.getSolrSplitSize(conf);
         this.outputBuffer = new ArrayList<SolrInputDocument>(solrSplitSize);
-        this.server = new HttpSolrServer(url);
+        this.server = SolrServerFactory.getInstance().createCloudServer(zkUrl, collectionId);
 	}
 
 	public void save(SolrInputDocument doc) throws IOException {
