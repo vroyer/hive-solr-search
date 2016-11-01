@@ -24,10 +24,10 @@
     	<id>dmp-snapshots</id>
     	<url>http://nexus.int.scdmp.net/repository/dmp-snapshots</url>
     </snapshotRepository>
-	<Repository>
+	<repository>
     	<id>dmp-releases</id>
     	<url>http://nexus.int.scdmp.net/repository/dmp-releases</url>
-    </Repository>
+    </repository>
   </distributionManagement>
 	
   <url>http://maven.apache.org</url>
