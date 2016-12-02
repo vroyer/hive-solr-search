@@ -4,7 +4,7 @@
 
   <groupId>org.vroyer.apache.hadoop.hive</groupId>
   <artifactId>hive-solr-search</artifactId>
-  <version>0.1-cdh5.7.2</version>
+  <version>0.2-cdh5.7.2</version>
   <packaging>jar</packaging>
 
   <name>hive-solr-search</name>

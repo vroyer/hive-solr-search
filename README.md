@@ -11,11 +11,11 @@ Installation
 
 To install:
 
-	$ git clone http://github.org/vroyer/hive-solr-search
+	$ git clone http://github.org/SteppeChange/hive-solr-search
 	$ cd hive-solr-search
 	$ mvn package
-	$ cp target/hive-solr-search-0.1-SNAPSHOT.jar `$HIVE_HOME/lib`
-	$ cp target/hive-solr-search-0.1-SNAPSHOT.jar `$HADOOP_HOME/lib`
+	$ cp target/hive-solr-search-0.2-cdh5.7.2-jar-with-dependencies.jar `$HIVE_HOME/lib`
+	$ cp target/hive-solr-search-0.2-cdh5.7.2-jar-with-dependencies.jar `$HADOOP_HOME/lib`
 
 Basic Usage
 ===========
@@ -27,7 +27,7 @@ Create an external hive table, map SOLR document fields to columns and provide a
 	CREATE EXTERNAL TABLE hive_solr_wiki ( id INT, date TIMESTAMP, title  STRING, name STRING) 
 	STORED BY "org.vroyer.hive.solr.SolrStorageHandler" 
 	WITH SERDEPROPERTIES ( "solr.document.mapping" = "id,date,title,name")
-	TBLPROPERTIES ("solr.url" = "http://localhost:8983/solr/wiki.solr", "solr.qs"="q=title:%22List of solar%22" );
+	TBLPROPERTIES ("zk.url" = "http://localhost:2181/solr", "solr.qs"="q=title:%22List of solar%22" );
 
 	hive> SELECT * FROM hive_solr_wiki;
 	OK
@@ -64,7 +64,7 @@ You can also use a SOLR facets to aggregate some data like a GROUP BY, here in a
 	STORED BY "org.vroyer.hive.solr.SolrStorageHandler"
 	WITH SERDEPROPERTIES ( "solr.facet.mapping" = "ranges")
 	TBLPROPERTIES (
-	   "solr.url" = "http://localhost:8983/solr/wiki.solr", 
+	   "zk.url" = "http://localhost:2181/solr",
 	   "solr.qs"="q=*%3A*&facet=true&facet.range=date&facet.range.gap=%2B1YEAR&f.date.facet.range.start=NOW/YEAR%2D10YEARS&f.date.facet.range.end=NOW"
 	);
 	
@@ -115,7 +115,7 @@ If you set hive.optimize.ppd=true, the SolrStorageHandler parses the WHERE claus
 
 	CREATE EXTERNAL TABLE hive_solr_wiki_fq ( id INT, date TIMESTAMP, title  STRING) 
 	STORED BY "org.vroyer.hive.solr.SolrStorageHandler" WITH SERDEPROPERTIES ( "solr.document.mapping" = "id,date,title")
-	TBLPROPERTIES ("solr.url" = "http://localhost:8983/solr/wiki.solr" );
+	TBLPROPERTIES ("zk.url" = "http://localhost:8983/solr" );
 	
 	hive> SELECT * FROM hive_solr_wiki_fq WHERE title='"List of solar"';
 	OK
@@ -147,7 +147,7 @@ You can also use a solr_query parameter to dynamically set the SOLR q parameter,
 
 	CREATE EXTERNAL TABLE hive_solr_wiki_q ( id INT, date TIMESTAMP, title  STRING, solr_query STRING) 
 	STORED BY "org.vroyer.hive.solr.SolrStorageHandler" WITH SERDEPROPERTIES ( "solr.document.mapping" = "id,date,title,solr_query")
-	TBLPROPERTIES ("solr.url" = "http://localhost:8983/solr/wiki.solr" );
+	TBLPROPERTIES ("zk.url" = "http://localhost:2181/solr" );
 	
 	hive> SELECT * FROM hive_solr_wiki_q WHERE solr_query='title:natio*';
 	OK
@@ -196,6 +196,25 @@ Because Hive currently evaluates the pushed predicates twice when residual predi
 	
 	Time taken: 1.191 seconds, Fetched: 30 row(s)
 
+Kerberos
+================
+
+In order to use Kerberos capabilities you have to set the following table properties: `kerberos.use, kerberos.jaas.config.path, kerberos.krb5.config.path, kerberos.useSubjectCredsOnly`.
+
+Example:
+
+    CREATE EXTERNAL TABLE hive_solr_wiki ( id INT, date TIMESTAMP, title  STRING, name STRING) 
+	STORED BY "org.vroyer.hive.solr.SolrStorageHandler" 
+	WITH SERDEPROPERTIES (
+	    "solr.document.mapping" = "id,date,title,name"
+	) TBLPROPERTIES (
+	    "zk.url" = "http://localhost:2181/solr",
+	    "kerberos.use" = "true",
+	    "kerberos.jaas.config.path" = "/tmp/jaas.conf",
+	    "kerberos.krb5.config.path" = "/etc/kerberos/user.keytab",
+	    "kerberos.useSubjectCredsOnly" = "true"
+	);
+	
 Acknowledgements
 ================
 

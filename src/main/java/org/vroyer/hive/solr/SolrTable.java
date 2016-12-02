@@ -54,6 +54,9 @@ public class SolrTable {
 
 	
 	public SolrTable(JobConf conf) {
+
+		KerberosInitializer.init(conf);
+
 		String filterExprSerialized = conf.get(TableScanDesc.FILTER_EXPR_CONF_STR);
 		if (filterExprSerialized != null) {
 			ExprNodeDesc filterExpr = Utilities.deserializeExpression(filterExprSerialized);
