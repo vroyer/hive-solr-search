@@ -88,6 +88,11 @@ public class SolrSerDe implements SerDe {
 		log.debug("tblProperties="+tbl);
 		final String facetType = tbl.getProperty(ConfigurationUtil.SOLR_FACET_MAPPING);
 		final String columnString = tbl.getProperty(ConfigurationUtil.SOLR_COLUMN_MAPPING);
+//		CustomLogger.info("tblProperties="+tbl);
+//		CustomLogger.info(ConfigurationUtil.SOLR_FACET_MAPPING + ": " + facetType);
+//		CustomLogger.info(ConfigurationUtil.SOLR_COLUMN_MAPPING + ": " + columnString);
+//		CustomLogger.info(Constants.LIST_COLUMNS + ": " + tbl.getProperty(Constants.LIST_COLUMNS));
+
 		if (StringUtils.isBlank(facetType)) {
 			if (StringUtils.isBlank(columnString)) {
 				throw new SerDeException("No facet mapping found, using "+ ConfigurationUtil.SOLR_COLUMN_MAPPING);
@@ -96,6 +101,7 @@ public class SolrSerDe implements SerDe {
 			colNames = Arrays.asList(columnNamesArray);
 			log.debug(ConfigurationUtil.SOLR_COLUMN_MAPPING+" = " + colNames);
 			row = new ArrayList<Object>(columnNamesArray.length);
+//			CustomLogger.info("!!!!!!!COLUMN_NAME1: size=[" + colNames + "] : " + colNames.toString());
 		} else {
 			row = new ArrayList<Object>(2);
 			colNames = Arrays.asList(StringUtils.split(tbl.getProperty(Constants.LIST_COLUMNS),","));
