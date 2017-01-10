@@ -115,7 +115,16 @@ public class SolrReader implements RecordReader<LongWritable, MapWritable> {
 
 		this.split = split;
 		SolrTable table = new SolrTable(conf);
-		cursor = table.getCursor((int) split.getStart(), (int) split.getLength());
+		CustomLogger.info("SolrReader: try to get cursor. Split: start=" + split.getStart() + ", length=" + split.getLength());
+		try {
+			cursor = table.getCursor((int) split.getStart(), (int) split.getLength());
+		} catch (IOException e) {
+			CustomLogger.info("SolrReader: IO ERROR getting cursor: " + e);
+			throw e;
+		} catch (RuntimeException e) {
+			CustomLogger.info("SolrReader: ERROR getting cursor: " + e);
+			throw e;
+		}
 	}
 
 	/**

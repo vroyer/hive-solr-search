@@ -59,11 +59,16 @@ public class SolrInputFormat extends HiveInputFormat<LongWritable, MapWritable> 
 	@Override
 	public InputSplit[] getSplits(JobConf conf, int numSplits) throws IOException {
 		log.debug("conf="+conf);
+		CustomLogger.info("SolrInputFormat: JOB_CONF: \n" + conf);
 
 		SolrTable table = new SolrTable(conf);
+		CustomLogger.info("SolrInputFormat: Try to table.count().... ");
 		long total = table.count();
+		CustomLogger.info("SolrInputFormat: Table.count() is OK: " + total);
 		int _numSplits = (numSplits < 1 || total <= numSplits) ? 1 : numSplits;
+		CustomLogger.info("SolrInputFormat: _numSplits: " + _numSplits);
 		final long splitSize = total / _numSplits;
+		CustomLogger.info("SolrInputFormat: splitSize: " + splitSize);
 		SolrSplit[] splits = new SolrSplit[_numSplits];
 		final Path[] tablePaths = FileInputFormat.getInputPaths(conf);
 		for (int i = 0; i < _numSplits; i++) {
@@ -75,6 +80,7 @@ public class SolrInputFormat extends HiveInputFormat<LongWritable, MapWritable> 
 		      }
 		}
 		log.debug("splits=" + Arrays.toString(splits));
+		CustomLogger.info("SolrInputFormat: splits: " + Arrays.toString(splits));
 		return splits;
 	}
 

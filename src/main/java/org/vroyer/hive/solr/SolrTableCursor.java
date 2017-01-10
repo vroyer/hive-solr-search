@@ -37,18 +37,20 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.RangeFacet;
+import org.apache.solr.client.solrj.response.SolrPingResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 
 public class SolrTableCursor {
 	SolrTable table ;
 	
-	private HttpSolrServer server;
+	private SolrServer server;
 	private int start;
 	private int count;
 	private int solrSplitSize;
@@ -64,7 +66,7 @@ public class SolrTableCursor {
 	
 	SolrTableCursor(SolrTable table, int start, int count, int solrSplitSize) throws IOException {
 		this.table = table;
-        server = new HttpSolrServer(table.url);
+        server = SolrServerFactory.getInstance().createCloudServer(table.zkUrl, table.collectionId);
         this.start = start;
         this.count = count;
         this.solrSplitSize = solrSplitSize;
@@ -107,15 +109,39 @@ public class SolrTableCursor {
 			for(String s: map.keySet()) {
 				sb.append(s).append('=').append(Arrays.toString(map.get(s))).append(' ');
 			}
-			log.info("SOLR request: "+table.url+" "+sb.toString());
+			log.info("SOLR request: "+sb.toString());
 		}
-		
-        
+
+
+		/*try{
+		CustomLogger.info("SolrTableCursor: PING to SOLR..");
+			SolrPingResponse response1 = server.ping();
+			CustomLogger.info("SolrTableCursor: PING to SOLR is OK: "+ response1);
+		}catch (SolrServerException e) {
+			CustomLogger.info("SolrTableCursor: ERROR solr PING: " + e);
+		} catch (RuntimeException e) {
+			CustomLogger.info("SolrTableCursor: RT ERROR solr PING: " + e);
+		}*/
+
+		CustomLogger.info("SolrTableCursor: Try to solr query: " + query);
+
+		String mandatoryFilterField = "msisdn_hex";
+		if (!table.fq.toString().contains("msisdn_hex")) {
+			String error = "ERROR: Query to SOLR doesn't contain mandatory field [" + mandatoryFilterField + "]. The current SOLR filter (fq) is: [" + table.fq + "]. Stop the query.";
+			CustomLogger.info(error);
+			throw new IllegalArgumentException(error);
+		}
+
 		QueryResponse response;
 		try {
 			response = server.query(query);
+			CustomLogger.info("SolrTableCursor: SUCCESS solr query: " + response.toString());
 		} catch (SolrServerException e) {
+			CustomLogger.info("SolrTableCursor: ERROR solr query: " + e);
 			throw new IOException(e);
+		} catch (RuntimeException e) {
+			CustomLogger.info("SolrTableCursor: RT ERROR solr query: " + e);
+			throw e;
 		}
 		
 		if (table.facetType != null) {
